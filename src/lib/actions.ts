@@ -2,6 +2,9 @@
 
 import OpenAI from "openai";
 import { getUserMessage } from "./prompts";
+import { db } from "./db";
+import { trips } from "./schema";
+import { nanoid } from "nanoid";
 
 const openai = new OpenAI();
 
@@ -81,7 +84,24 @@ async function fetchImage(query: string) {
     },
   });
 
-  const json = await result.json();
+  const json = (await result.json()) as {
+    photos: {
+      src: {
+        large: string;
+      };
+    }[];
+  };
 
   return json.photos[0].src.large as string;
 }
+
+export const saveDesitnation = async (
+  city: string,
+  country: string,
+  descriptionShort: string,
+  imageUrl: string
+) => {
+  await db
+    .insert(trips)
+    .values({ id: nanoid(14), city, country, descriptionShort, imageUrl });
+};

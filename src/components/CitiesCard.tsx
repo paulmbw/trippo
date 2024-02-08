@@ -1,8 +1,11 @@
-import type { City } from "@/lib/actions";
+import { saveDesitnation, type City } from "@/lib/actions";
 import { Check } from "lucide-react";
 import Image from "next/image";
 
-type Props = City;
+type Props = City & {
+  pending: boolean;
+  onClick: () => void;
+};
 
 export default function CitiesCard({
   name,
@@ -10,6 +13,8 @@ export default function CitiesCard({
   description,
   reasons,
   image,
+  pending,
+  onClick,
 }: Props) {
   return (
     <div className="max-w-sm h-[550px] border rounded-lg shadow-sm flex flex-col hover:scale-105 transition-all duration-700">
@@ -44,7 +49,11 @@ export default function CitiesCard({
         </ul>
 
         <div className="mt-auto">
-          <button className="border px-3 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white w-full font-semibold">
+          <button
+            disabled={pending}
+            onClick={onClick}
+            className="border px-3 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white w-full font-semibold disabled:cursor-not-allowed disabled:opacity-50"
+          >
             Discover {name}
           </button>
         </div>
