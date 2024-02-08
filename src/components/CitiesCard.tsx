@@ -12,7 +12,7 @@ export default function CitiesCard({
   image,
 }: Props) {
   return (
-    <div className="max-w-sm h-[550px] border rounded-lg shadow-sm flex flex-col">
+    <div className="max-w-sm h-[550px] border rounded-lg shadow-sm flex flex-col hover:scale-105 transition-all duration-700">
       {image ? (
         <div className="aspect-video relative overflow-hidden rounded-t-lg">
           <Image
@@ -29,6 +29,7 @@ export default function CitiesCard({
           <p className="text-xl font-bold">{name}</p>
           <p className="text-gray-600">{country}</p>
         </div>
+
         <p>{description}</p>
 
         <ul className="mt-4 space-y-2">
