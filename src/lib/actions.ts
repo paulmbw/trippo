@@ -5,6 +5,7 @@ import { getUserMessage } from "./prompts";
 import { db } from "./db";
 import { trips } from "./schema";
 import { nanoid } from "nanoid";
+import { revalidatePath } from "next/cache";
 
 const openai = new OpenAI();
 
@@ -104,4 +105,6 @@ export const saveDesitnation = async (
   await db
     .insert(trips)
     .values({ id: nanoid(14), city, country, descriptionShort, imageUrl });
+
+  revalidatePath("/dashboard");
 };

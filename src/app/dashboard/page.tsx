@@ -50,7 +50,7 @@ export default async function Home() {
   return (
     <Container>
       <h1 className="text-4xl my-8">Dashboard</h1>
-      <div className="grid grid-cols-3 gap-16 pb-16">
+      <div className="grid lg:grid-cols-3 md:grid-cols-2 content-center gap-16 pb-16">
         {allTrips.map((trip) => {
           return (
             <TripPreviewCard
