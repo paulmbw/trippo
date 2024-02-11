@@ -1,4 +1,4 @@
-import { saveDesitnation, type City } from "@/lib/actions";
+import { type City } from "@/lib/actions";
 import { Check } from "lucide-react";
 import Image from "next/image";
 

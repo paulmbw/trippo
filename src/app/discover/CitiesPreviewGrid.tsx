@@ -4,7 +4,12 @@ import { useTransition } from "react";
 
 type Props = GenerateState;
 
-export default function CitiesPreviewGrid({ cities }: Props) {
+export default function CitiesPreviewGrid({
+  cities,
+  budget,
+  from,
+  days,
+}: Props) {
   const [pending, startTransition] = useTransition();
 
   return (
@@ -21,7 +26,7 @@ export default function CitiesPreviewGrid({ cities }: Props) {
                 /**
                  * startTransition allows you to decide the priority of components (show higher priority components first while lower priority componends
                  * take time to render).
-                 * 
+                 *
                  * In this example, we're using the pending state from useTransition to control the disabled state of the buttons. We want to provide some feedback
                  * to the user that something is happenning while clicking the discover button.
                  */
@@ -30,7 +35,10 @@ export default function CitiesPreviewGrid({ cities }: Props) {
                     city.name,
                     city.country,
                     city.description,
-                    city.image || ""
+                    city.image || "",
+                    budget,
+                    from,
+                    days
                   );
                 });
               }}

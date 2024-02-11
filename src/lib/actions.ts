@@ -1,11 +1,13 @@
 "use server";
 
 import OpenAI from "openai";
-import { getUserMessage } from "./prompts";
+import { getSaveDestinationUserMessage, getUserMessage } from "./prompts";
 import { db } from "./db";
 import { trips } from "./schema";
 import { nanoid } from "nanoid";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { eq } from "drizzle-orm";
 
 const openai = new OpenAI();
 
@@ -96,15 +98,93 @@ async function fetchImage(query: string) {
   return json.photos[0].src.large as string;
 }
 
+type OpenAIResponse = {
+  trip_description: string;
+  flight_price_min: number;
+  flight_price_max: number;
+  flight_time: string;
+  hotel_price: {
+    "3": number;
+    "4": number;
+    "5": number;
+  };
+  tip: string;
+  itinerary: {
+    day: number;
+    title: string;
+    description: string;
+    activities: string[];
+  }[];
+};
+
 export const saveDesitnation = async (
   city: string,
   country: string,
   descriptionShort: string,
-  imageUrl: string
+  imageUrl: string,
+  budget: number,
+  from: string,
+  days: number
 ) => {
-  await db
-    .insert(trips)
-    .values({ id: nanoid(14), city, country, descriptionShort, imageUrl });
+  const response = await openai.chat.completions.create({
+    model: "gpt-3.5-turbo-1106",
+    messages: [
+      {
+        role: "system",
+        content:
+          "You are a travel assistant helping clients find the best holidays",
+      },
+      {
+        role: "user",
+        content: getSaveDestinationUserMessage({
+          city,
+          country,
+          details: descriptionShort,
+          days,
+          budget,
+          from,
+        }),
+      },
+    ],
+    response_format: {
+      type: "json_object",
+    },
+  });
+
+  const content = response.choices[0].message.content;
+
+  if (!content) {
+    return null;
+  }
+
+  const tripDetails = JSON.parse(content) as OpenAIResponse;
+
+  const id = nanoid(14);
+
+  await db.insert(trips).values({
+    id,
+    city,
+    country,
+    descriptionShort,
+    imageUrl,
+    descriptionLong: tripDetails.trip_description,
+    flightMin: tripDetails.flight_price_min,
+    flightMax: tripDetails.flight_price_max,
+    flightTime: tripDetails.flight_time,
+    hotel3: tripDetails.hotel_price["3"],
+    hotel4: tripDetails.hotel_price["4"],
+    hotel5: tripDetails.hotel_price["5"],
+    tip: tripDetails.tip,
+    itinerary: tripDetails.itinerary,
+  });
 
   revalidatePath("/dashboard");
+  redirect(`/trips/${id}`);
+};
+
+export const deleteTrip = async (tripId: string) => {
+  await db.delete(trips).where(eq(trips.id, tripId));
+
+  revalidatePath("/dashboard");
+  redirect("/dashboard");
 };
