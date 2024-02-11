@@ -33,8 +33,8 @@ type Props = {
 export default function ItineraryList({ itinerary }: Props) {
   return (
     <div className="flex flex-col space-y-8 px-8">
-      {itinerary.map((day) => {
-        return <ItineraryCard {...day} />;
+      {itinerary.map((day, index) => {
+        return <ItineraryCard key={index} {...day} />;
       })}
     </div>
   );
